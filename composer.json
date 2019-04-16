@@ -1,0 +1,40 @@
+{
+    "name": "storychief/storychief-v3",
+    "description": "Craft CMS plugin to use with Storychief",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "storychief v3"
+    ],
+    "support": {
+        "docs": "???",
+        "issues": "???"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Storychief",
+            "homepage": "https://github.com/Story-Chief/"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1"
+    },
+    "autoload": {
+        "psr-4": {
+          "storychief\\storychiefv3\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Storychief v3",
+        "handle": "storychief-v3",
+        "hasCpSettings": false,
+        "hasCpSection": false,
+        "changelogUrl": "???",
+        "class": "storychief\\storychiefv3\\StorychiefV3"
+    }
+}
