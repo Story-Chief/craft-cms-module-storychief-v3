@@ -1,6 +1,9 @@
 <?php
 namespace storychief\storychiefv3\variables;
 
+use storychief\storychiefv3\storychief\FieldTypes\StoryChiefFieldTypeInterface;
+use craft;
+
 class StoryChiefVariable
 {
     public function getStoryChiefSections()
@@ -57,8 +60,9 @@ class StoryChiefVariable
                 'type'  => 'textarea',
             ],
         ];
-        $settings = \Craft::$app->plugins->getPlugin('storyChief')->getSettings();
-        $custom_fields = $settings->getAttribute('custom_field_definitions');
+        
+        $settings = Craft::$app->plugins->getPlugin('storychief-v3')->getSettings();
+        $custom_fields = $settings['custom_field_definitions'];
 
         return array_merge($default_fields, $custom_fields);
     }
@@ -66,7 +70,7 @@ class StoryChiefVariable
     public function getStoryChiefFieldOptions($fieldHandle)
     {
         $field = \Craft::$app->fields->getFieldByHandle($fieldHandle);
-        $class = str_replace(array('Craft\\', 'FieldType'), array('\\Craft\\', 'StoryChiefFieldType'), get_class($field->getFieldType()));
+        $class = str_replace('craft\\fields', '\\storychief\\storychiefv3\\storychief\\FieldTypes', get_class($field)).'StoryChiefFieldType';
         $allFields = $this->getAllStoryChiefFields();
         $options = [];
         if (class_exists($class)) {
@@ -123,14 +127,15 @@ class StoryChiefVariable
         $fieldDefinitions = [];
 
         $entryType = \Craft::$app->sections->getEntryTypeById($entryTypeID);
-        $fields = \Craft::$app->fields->getLayoutById($entryType->getAttribute('fieldLayoutId'))->getFields();
+
+
+        $fields = $entryType->getFieldLayout()->getFields();
 
         foreach ($fields as $field) {
-            $fieldDefinition = $field->getField()->getAttributes(['id', 'type', 'name', 'handle']);
-            $fieldDefinition['required'] = $field->getAttribute('required') === '1';
+            $fieldDefinition = $field->getAttributes(['id', 'name', 'handle']);
+            $fieldDefinition['required'] = $field->required === '1';
             $fieldDefinitions[] = $fieldDefinition;
         }
-
         return $fieldDefinitions;
     }
 }

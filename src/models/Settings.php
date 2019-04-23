@@ -17,7 +17,6 @@ class Settings extends Model
         return [
           [['key', 'section', 'entry_type'], 'string'],
           [['key', 'section', 'entry_type'], 'required'],
-          [['custom_field_definitions', 'mapping'], 'string'],
     ];
     }
 }

@@ -1,6 +1,6 @@
 <input type="hidden" name="redirect" id="redirect" value="{{ 'settings/plugins/storychief' }}">
 {% import "_includes/forms" as forms %}
-
+{{ d(settings.getErrors())}}
 <h2>Connect</h2><a name="connect"></a>
 <p>Step 1: Connect your website to Story Chief</p>
 {{ forms.passwordField({
@@ -34,6 +34,7 @@
     value: settings.section,
     options: [{ label: 'Select', value: '' }] | merge(craft.storyChief.getStoryChiefSections()),
     required: true,
+    errors: settings.getErrors('section')
 }) }}
 
 {% if settings.section %}
@@ -45,6 +46,7 @@
         value: settings.entry_type,
         options: [{ label: 'Select', value: '' }] | merge(craft.storyChief.getStoryChiefEntryTypes(settings.section)),
         required: true,
+        errors: settings.getErrors('entry_type')
     }) }}
 {% endif %}
 

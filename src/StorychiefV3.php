@@ -10,13 +10,17 @@
 
 namespace storychief\storychiefv3;
 
-
 use Craft;
+use yii\base\Event;
 use craft\base\Plugin;
 use craft\services\Plugins;
+use craft\web\UrlManager;
+use craft\web\twig\variables\CraftVariable;
 use craft\events\PluginEvent;
-
-use yii\base\Event;
+use storychief\storychiefv3\models\Settings;
+use storychief\storychiefv3\variables\StoryChiefVariable;
+use storychief\storychiefv3\controllers\Webhook;
+use craft\events\RegisterUrlRulesEvent;
 
 /**
  * Class StorychiefV3
@@ -35,14 +39,16 @@ class StorychiefV3 extends Plugin
      * @var StorychiefV3
      */
     public static $plugin;
-
+    
+    
     // Public Properties
     // =========================================================================
-
+    
     /**
      * @var string
      */
     public $schemaVersion = '1.0.0';
+    public $hasCpSettings = true;
 
     // Public Methods
     // =========================================================================
@@ -64,6 +70,18 @@ class StorychiefV3 extends Plugin
             }
         );
 
+        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function (Event $event) {
+            /** @var CraftVariable $variable */
+            $variable = $event->sender;
+            $variable->set('storyChief', StoryChiefVariable::class);
+        });
+
+        Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_SITE_URL_RULES, function (RegisterUrlRulesEvent $event) {
+            $event->rules = array_merge($event->rules, [
+                'storychief/webhook' => 'storychief-v3/webhook/callback',
+            ]);
+        });
+
         Craft::info(
             Craft::t(
                 'storychief-v3',
@@ -76,5 +94,15 @@ class StorychiefV3 extends Plugin
 
     // Protected Methods
     // =========================================================================
-
+    protected function createSettingsModel()
+    {
+        return new Settings();
+    }
+    protected function settingsHtml()
+    {
+        return Craft::$app->getView()->renderTemplate('storychief-v3/settings', [
+            'settings' => $this->getSettings(),
+            'redirect' => 'settings/plugins/storychief',
+        ]);
+    }
 }
