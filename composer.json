@@ -11,8 +11,8 @@
         "storychief v3"
     ],
     "support": {
-        "docs": "???",
-        "issues": "???"
+        "docs": "https://github.com/Story-Chief/craft-cms-module-storychief",
+        "issues": "https://github.com/Story-Chief/craft-cms-module-storychief/issues"
     },
     "license": "MIT",
     "authors": [
@@ -32,9 +32,9 @@
     "extra": {
         "name": "Storychief v3",
         "handle": "storychief-v3",
-        "hasCpSettings": false,
+        "hasCpSettings": true,
         "hasCpSection": false,
-        "changelogUrl": "???",
+        "changelogUrl": "https://github.com/Story-Chief/craft-cms-module-storychief/master/CHANGELOG.md",
         "class": "storychief\\storychiefv3\\StorychiefV3"
     }
 }

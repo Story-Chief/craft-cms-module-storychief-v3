@@ -19,7 +19,6 @@ use craft\web\twig\variables\CraftVariable;
 use craft\events\PluginEvent;
 use storychief\storychiefv3\models\Settings;
 use storychief\storychiefv3\variables\StoryChiefVariable;
-use storychief\storychiefv3\controllers\Webhook;
 use craft\events\RegisterUrlRulesEvent;
 
 /**
@@ -100,9 +99,14 @@ class StorychiefV3 extends Plugin
     }
     protected function settingsHtml()
     {
+        $settings = $this->getSettings();
+        $settings->validate();
+
         return Craft::$app->getView()->renderTemplate('storychief-v3/settings', [
-            'settings' => $this->getSettings(),
-            'redirect' => 'settings/plugins/storychief',
+            'plugin' => $this,
+            'title'  => $this->handle,
+            'settings' => $settings,
+            'redirect' => 'settings/plugins/storychief-v3',
         ]);
     }
 }
