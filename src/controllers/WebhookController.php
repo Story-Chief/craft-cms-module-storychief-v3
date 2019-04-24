@@ -117,7 +117,7 @@ class WebhookController extends Controller
 
     protected function handleDeleteEventType()
     {
-        craft()->entries->deleteEntryById($this->payload['data']['external_id']);
+        Craft::$app->getElements()->deleteElementById($this->payload['data']['external_id']);
 
         return '';
     }
