@@ -96,9 +96,10 @@ class WebhookController extends Controller
 
     protected function handleUpdateEventType()
     {
-        $criteria = craft()->elements->getCriteria(ElementType::Entry);
+        $criteria = \craft\elements\Entry::find();
         $criteria->id = $this->payload['data']['external_id'];
-        if (craft()->isLocalized() && isset($this->payload['data']['language']) && $this->payload['data']['language']) {
+        
+        if (Craft::$app->language !== 'en' && isset($this->payload['data']['language']) && $this->payload['data']['language']) {
             $criteria->locale = $this->payload['data']['language'];
         }
 
@@ -106,8 +107,7 @@ class WebhookController extends Controller
 
         $entry = $this->_map($entry);
 
-        craft()->entries->saveEntry($entry);
-        craft()->templateCache->deleteAllCaches();
+        Craft::$app->elements->saveElement($entry);
 
         return $this->_appendMac([
             'id'        => $entry->id,
