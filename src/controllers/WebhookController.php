@@ -29,10 +29,10 @@ class WebhookController extends Controller
         $this->payload = json_decode($body, true);
 
 
-
+        
         if (!$this->validateCallback()) {
-            http_response_code(400);
-            return 'Callback failed validation';
+            Craft::$app->getResponse()->setStatusCode(400);
+            return $this->asJson('Callback failed validation');
         }
 
         $this->event = $this->payload['meta']['event'];
