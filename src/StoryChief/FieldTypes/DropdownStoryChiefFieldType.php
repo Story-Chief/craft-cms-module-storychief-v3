@@ -19,8 +19,7 @@ class DropdownStoryChiefFieldType implements StoryChiefFieldTypeInterface
             return null;
         }
 
-        $settings = $field->getFieldType()->getSettings();
-        $options = $settings->getAttribute('options');
+        $options = $field->options;
 
         foreach ($options as $option) {
             if ($fieldData[0] == $option['value']) {
