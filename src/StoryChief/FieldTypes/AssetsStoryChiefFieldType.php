@@ -1,5 +1,7 @@
 <?php namespace storychief\storychiefv3\storychief\FieldTypes;
 
+use  craft\base\Field;
+
 class AssetsStoryChiefFieldType implements StoryChiefFieldTypeInterface
 {
     public function supportedStorychiefFieldTypes()
@@ -10,7 +12,7 @@ class AssetsStoryChiefFieldType implements StoryChiefFieldTypeInterface
         ];
     }
 
-    public function prepFieldData(FieldModel $field, $fieldData)
+    public function prepFieldData(Field $field, $fieldData)
     {
         $folderId = $field->getFieldType()->resolveSourcePath();
         $preppedData = [];

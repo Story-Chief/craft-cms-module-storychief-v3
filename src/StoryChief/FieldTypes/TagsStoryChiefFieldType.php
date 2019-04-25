@@ -1,5 +1,7 @@
 <?php namespace storychief\storychiefv3\storychief\FieldTypes;
 
+use  craft\base\Field;
+
 class TagsStoryChiefFieldType implements StoryChiefFieldTypeInterface
 {
     public function supportedStorychiefFieldTypes()
@@ -11,7 +13,7 @@ class TagsStoryChiefFieldType implements StoryChiefFieldTypeInterface
         ];
     }
 
-    public function prepFieldData(FieldModel $field, $fieldData)
+    public function prepFieldData(Field $field, $fieldData)
     {
         $preppedData = [];
 

@@ -1,5 +1,7 @@
 <?php namespace storychief\storychiefv3\storychief\FieldTypes;
 
+use  craft\base\Field;
+
 class MultiSelectStoryChiefFieldType implements StoryChiefFieldTypeInterface
 {
     public function supportedStorychiefFieldTypes()
@@ -9,7 +11,7 @@ class MultiSelectStoryChiefFieldType implements StoryChiefFieldTypeInterface
         ];
     }
 
-    public function prepFieldData(FieldModel $field, $fieldData)
+    public function prepFieldData(Field $field, $fieldData)
     {
         $preppedData = [];
 
