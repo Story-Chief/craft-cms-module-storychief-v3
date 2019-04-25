@@ -106,7 +106,6 @@ class StorychiefV3 extends Plugin
             'plugin' => $this,
             'title'  => $this->handle,
             'settings' => $settings,
-            'redirect' => 'settings/plugins/storychief-v3',
         ]);
     }
 }
