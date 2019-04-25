@@ -1,6 +1,9 @@
 <?php namespace storychief\storychiefv3\storychief\FieldTypes;
 
-use  craft\base\Field;
+use Craft;
+use craft\base\Field;
+use craft\helpers\Db;
+use craft\elements\Tag;
 
 class TagsStoryChiefFieldType implements StoryChiefFieldTypeInterface
 {
@@ -23,32 +26,38 @@ class TagsStoryChiefFieldType implements StoryChiefFieldTypeInterface
         if (!is_array($fieldData)) {
             $fieldData = array($fieldData);
         }
+        
+        $source = $field->source;
+        list($type, $groupUid) = explode(':', $source);
 
-        $settings = $field->getFieldType()->getSettings();
+        $tagGroup =  (new \craft\db\Query())
+        ->select(['id'])
+        ->from('taggroups')
+        ->where(['uid' => $groupUid])
+        ->one();
 
-        // Get tag group id
-        $source = $settings->getAttribute('source');
-        list($type, $groupId) = explode(':', $source);
+        $groupId = $tagGroup['id'];
+
 
         // Find existing
         foreach ($fieldData as $tagName) {
-            $criteria = craft()->elements->getCriteria(ElementType::Tag);
+            $criteria = Tag::find();
             $criteria->status = null;
             $criteria->groupId = $groupId;
-            $criteria->title = DbHelper::escapeParam($tagName);
-
+            $criteria->title = Db::escapeParam($tagName);
+            
             $elements = $criteria->ids();
 
             $preppedData = array_merge($preppedData, $elements);
 
             // Create the elements if not found
             if (count($elements) == 0) {
-                $element = new TagModel();
-                $element->getContent()->title = $tagName;
+                $element = new Tag();
+                $element->title = $tagName;
                 $element->groupId = $groupId;
 
                 // Save tag
-                if (craft()->tags->saveTag($element)) {
+                if (Craft::$app->elements->saveElement($element)) {
                     $preppedData[] = $element->id;
                 }
             }
