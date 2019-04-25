@@ -27,7 +27,7 @@ class StoryChiefVariable
             [
                 'label' => 'Content',
                 'name'  => 'content',
-                'type'  => 'richtext',
+                'type'  => 'textarea',
             ],
             [
                 'label' => 'Excerpt',
