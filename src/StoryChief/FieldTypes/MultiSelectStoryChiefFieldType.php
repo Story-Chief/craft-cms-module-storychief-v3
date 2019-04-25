@@ -22,8 +22,7 @@ class MultiSelectStoryChiefFieldType implements StoryChiefFieldTypeInterface
             $fieldData = array($fieldData);
         }
 
-        $settings = $field->getFieldType()->getSettings();
-        $options = $settings->getAttribute('options');
+        $options = $field->options;
 
         foreach ($options as $option) {
             foreach ($fieldData as $dataValue) {
