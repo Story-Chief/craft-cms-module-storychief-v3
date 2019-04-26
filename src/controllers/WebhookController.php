@@ -100,7 +100,7 @@ class WebhookController extends Controller
             $entry->siteId = $site['id'];
         }
         if ($this->payload['data']['source']) {
-            $entry = $this->handlePublishTranslation($entry);
+            $entry = $this->handlePublishTranslation();
         }
         Craft::$app->elements->saveElement($entry);
 
@@ -110,11 +110,12 @@ class WebhookController extends Controller
         ]);
     }
 
-    protected function handlePublishTranslation($entry)
+    protected function handlePublishTranslation()
     {
         $criteria = \craft\elements\Entry::find();
         $criteria->id = $this->payload['data']['source']['data']['external_id'];
-        $entry = $criteria->first();
+        $entry = $criteria->one();
+
 
         $site =  (new \craft\db\Query())
             ->select(['id'])
@@ -209,22 +210,10 @@ class WebhookController extends Controller
                 $user->firstName = $authorData['first_name'];
                 $user->lastName = $authorData['last_name'];
                 $user->email = $authorData['email'];
+                $user->passwordResetRequired = false;
+                $user->photoId = null;
 
-                $success = Craft::$app->users->saveUser($user);
-                if (!$success) {
-                    StoryChiefPlugin::log('Unable to create a user', LogLevel::Error);
-                    $user = null;
-                } else {
-                    if (isset($authorData['profile_picture']['data']['url'])) {
-                        $imageInfo = pathinfo($authorData['profile_picture']['data']['url']);
-                        $tempPath = CRAFT_STORAGE_PATH . 'runtime/temp/' . $imageInfo['basename'];
-                        file_put_contents($tempPath, fopen($authorData['profile_picture']['data']['url'], 'r'));
-
-                        $profile_picture = new Image();
-                        $profile_picture->loadImage($tempPath);
-                        Craft::$app->users->saveUserPhoto($authorData['profile_picture']['data']['name'], $profile_picture, $user);
-                    }
-                }
+                Craft::$app->getElements()->saveElement($user, false);
             }
             if (!is_null($user)) {
                 $entry->authorId =  $user->id;
