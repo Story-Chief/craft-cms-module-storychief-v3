@@ -1,7 +1,7 @@
 
-# Storychief v3 plugin for Craft CMS 3.x
+# StoryChief v3 plugin for Craft CMS 3.x
 
-Craft CMS plugin to use with [Storychief](https://storychief.io).
+Craft CMS plugin to use with [StoryChief](https://storychief.io).
 
 If you are using Craft CMS 2.x, you can find the [right plugin here](https://github.com/Story-Chief/craft-cms-module-storychief).
 
@@ -59,5 +59,5 @@ Finally, back to your StoryChief CRAFT CMS channel configuration, fill up your C
 
 
 
-Brought to you by [Storychief](https://github.com/Story-Chief/)
+Brought to you by [StoryChief](https://github.com/Story-Chief/)
 
