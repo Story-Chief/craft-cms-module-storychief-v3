@@ -6,6 +6,8 @@ use yii\web\Controller;
 use craft\elements\Entry;
 use craft\elements\User;
 use storychief\storychiefv3\storychief\FieldTypes\StoryChiefFieldTypeInterface;
+use craft\records\Site;
+use craft\helpers\Db;
 
 class WebhookController extends Controller
 {
@@ -79,13 +81,27 @@ class WebhookController extends Controller
         $entry = new Entry();
         $entry->sectionId = $section;
         $entry->typeId = $entry_type;
-        // Set language
-        if (Craft::$app->language !== 'en' && isset($this->payload['data']['language']) && $this->payload['data']['language']) {
-            $entry->locale =  $this->payload['data']['language'];
-        }
-
+ 
         $entry = $this->_map($entry);
-
+         
+        // Set language
+        // If language is set and there more than one language configure on CRAFT
+        if (
+            isset($this->payload['data']['language']) &&
+            $this->payload['data']['language'] &&
+            is_array($entry->site->group->sites) &&
+            sizeof($entry->site->group->sites) > 1) {
+            $site =  (new \craft\db\Query())
+            ->select(['id'])
+            ->from('sites')
+            ->where(['language' => $this->payload['data']['language'], 'groupId' => $entry->site->group->id])
+            ->one();
+                
+            $entry->siteId = $site['id'];
+        }
+        if ($this->payload['data']['source']) {
+            $entry = $this->handlePublishTranslation($entry);
+        }
         Craft::$app->elements->saveElement($entry);
 
         return $this->_appendMac([
@@ -94,19 +110,52 @@ class WebhookController extends Controller
         ]);
     }
 
+    protected function handlePublishTranslation($entry)
+    {
+        $criteria = \craft\elements\Entry::find();
+        $criteria->id = $this->payload['data']['source']['data']['external_id'];
+        $entry = $criteria->first();
+
+        $site =  (new \craft\db\Query())
+            ->select(['id'])
+            ->from('sites')
+            ->where(['language' => $this->payload['data']['language'], 'groupId' => $entry->site->group->id])
+            ->one();
+                
+        $criteria->siteId = $site['id'];
+
+        $entry = $this->_map($entry);
+
+        return $entry;
+    }
+
     protected function handleUpdateEventType()
     {
         $criteria = \craft\elements\Entry::find();
         $criteria->id = $this->payload['data']['external_id'];
-        
-        if (Craft::$app->language !== 'en' && isset($this->payload['data']['language']) && $this->payload['data']['language']) {
-            $criteria->locale = $this->payload['data']['language'];
-        }
-
         $entry = $criteria->first();
 
-        $entry = $this->_map($entry);
 
+        // Set language
+        if (
+            isset($this->payload['data']['language']) &&
+            $this->payload['data']['language'] &&
+            is_array($entry->site->group->sites) &&
+            sizeof($entry->site->group->sites) > 1) {
+            $site =  (new \craft\db\Query())
+            ->select(['id'])
+            ->from('sites')
+            ->where(['language' => $this->payload['data']['language'], 'groupId' => $entry->site->group->id])
+            ->one();
+                
+            $criteria = \craft\elements\Entry::find();
+            $criteria->id = $this->payload['data']['external_id'];
+            $criteria->siteId = $site['id'];
+            $entry = $criteria->first();
+        }
+
+        
+        $entry = $this->_map($entry);
         Craft::$app->elements->saveElement($entry);
 
         return $this->_appendMac([
