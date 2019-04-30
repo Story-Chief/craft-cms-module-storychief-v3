@@ -6,8 +6,6 @@ use yii\web\Controller;
 use craft\elements\Entry;
 use craft\elements\User;
 use storychief\storychiefv3\storychief\FieldTypes\StoryChiefFieldTypeInterface;
-use craft\records\Site;
-use craft\helpers\Db;
 
 class WebhookController extends Controller
 {
