@@ -25,19 +25,18 @@ class WebhookController extends Controller
 
     public function actionCallback()
     {
-        $body = @file_get_contents('php://input');
-        $this->payload = json_decode($body, true);
-
-
+        try {
+            $body = @file_get_contents('php://input');
+            $this->payload = json_decode($body, true);
         
-        if (!$this->validateCallback()) {
-            Craft::$app->getResponse()->setStatusCode(400);
-            return $this->asJson('Callback failed validation');
-        }
+            if (!$this->validateCallback()) {
+                Craft::$app->getResponse()->setStatusCode(400);
+                return $this->asJson('Callback failed validation');
+            }
 
-        $this->event = $this->payload['meta']['event'];
+            $this->event = $this->payload['meta']['event'];
 
-        switch ($this->event) {
+            switch ($this->event) {
             case 'publish':
                 $response = $this->handlePublishEventType();
                 break;
@@ -53,7 +52,11 @@ class WebhookController extends Controller
             default:
                 $response = $this->handleMissingEventType();
         }
-        return $this->asJson($response);
+            return $this->asJson($response);
+        } catch (\Exception $e) {
+            Craft::$app->getResponse()->setStatusCode(400);
+            return $this->asJson($e->getMessage());
+        }
     }
 
     protected function validateCallback()
