@@ -265,8 +265,8 @@ class WebhookController extends Controller
         switch ($scHandle) {
             case 'featured_image':
                 // returns image url
-                if (isset($this->payload['data'][$scHandle]['data']['url'])) {
-                    return $this->payload['data'][$scHandle]['data']['url'];
+                if (isset($this->payload['data'][$scHandle]['data']['sizes']['full'])) {
+                    return $this->payload['data'][$scHandle]['data']['sizes']['full'];
                 }
 
                 return null;
