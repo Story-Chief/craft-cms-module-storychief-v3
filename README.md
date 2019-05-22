@@ -3,47 +3,34 @@
 
 Craft CMS plugin to use with [StoryChief](https://storychief.io).
 
-If you are using Craft CMS 2.x, you can find the [right plugin here](https://github.com/Story-Chief/craft-cms-module-storychief).
 
-## How to install
+## Requirements
 
-First you need to save your plugin to a directory in your project. Craft doesn't require it to be a specific directory, but we are creating a plugins folder in our root and unziping the plugin inside its own folder. Like so:
-
-    config/
-    modules/
-    plugins/craft-cms-module-storychief-v3
-    ...
-    
-To get Craft to see your plugin, you will need to install it as a Composer dependency of your Craft project.
+This plugin requires Craft CMS 3.0.0 or later. (If you are using Craft CMS 2.x, you can find the [right plugin here](https://github.com/Story-Chief/craft-cms-module-storychief).)
 
 
-To set it up, open your Craft project’s composer.json file and make the following changes:
+## Installation
 
- - Set minimum-stability to "dev"
- - Set prefer-stable to true
- - Add a new path repository record, pointed at your plugin’s root directory.
+You can install this plugin from the Plugin Store or with Composer.
 
-Hera are the modifications you should make on your **composer.json**
+#### From the Plugin Store
 
+Go to the Plugin Store in your project’s Control Panel and search for “Storychief”. Then click on the “Install” button in its modal window.
 
-    {
-    
-      "minimum-stability": "dev",
-      "prefer-stable": true,
-      "repositories": [
-        {
-          "type": "path",
-	      "url": "plugins/craft-cms-module-storychief-v3"
-        }
-      ]
-    }
+#### With Composer
 
+Open your terminal and run the following commands:
 
-TIP: Set the url value to the absolute or relative path to your plugin’s source directory. 
+```bash
+# go to the project directory
+cd /path/to/my-project.test
 
-In your terminal, go to your Craft project and tell Composer to require your plugin. 
+# tell Composer to load the plugin
+composer require storychief/craft-cms-v3-storychief
 
-`composer require storychief/storychief-v3`
+# tell Craft to install the plugin
+./craft install/plugin storychief-v3
+```
 
 
 ## Activate
