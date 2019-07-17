@@ -6,16 +6,18 @@ use yii\web\Controller;
 use craft\elements\Entry;
 use craft\elements\User;
 use storychief\storychiefv3\storychief\FieldTypes\StoryChiefFieldTypeInterface;
+use storychief\storychiefv3\events\EntrySaveEvent;
 
 class WebhookController extends Controller
 {
+    const EVENT_AFTER_ENTRY_PUBLISH = "afterEntryPublish";
+    const EVENT_AFTER_ENTRY_UPDATE = "afterEntryUpdate";
+
     protected $allowAnonymous = true;
     protected $settings = null;
     protected $event = null;
     protected $payload = null;
     public $enableCsrfValidation = false;
-
-
 
     public function __construct($id, $module = null)
     {
@@ -105,6 +107,12 @@ class WebhookController extends Controller
         }
         Craft::$app->elements->saveElement($entry);
 
+        // Trigger after publish event.
+        $event = new EntrySaveEvent([
+            'entry' => $entry
+        ]);
+        $this->trigger(self::EVENT_AFTER_ENTRY_PUBLISH, $event);
+
         return $this->_appendMac([
             'id'        => $entry->id,
             'permalink' => $entry->getUrl(),
@@ -137,7 +145,6 @@ class WebhookController extends Controller
         $criteria->id = $this->payload['data']['external_id'];
         $entry = $criteria->first();
 
-
         // Set language
         if (
             isset($this->payload['data']['language']) &&
@@ -155,10 +162,15 @@ class WebhookController extends Controller
             $criteria->siteId = $site['id'];
             $entry = $criteria->first();
         }
-
         
         $entry = $this->_map($entry);
         Craft::$app->elements->saveElement($entry);
+
+        // Trigger after update event.
+        $event = new EntrySaveEvent([
+            'entry' => $entry
+        ]);
+        $this->trigger(self::EVENT_AFTER_ENTRY_UPDATE, $event);
 
         return $this->_appendMac([
             'id'        => $entry->id,

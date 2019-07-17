@@ -44,6 +44,14 @@ Finally, back to your StoryChief CRAFT CMS channel configuration, fill up your C
 
 :)
 
+## Events
+(Note: this is mostly for developers that know basic PHP and Composer Packages)
+
+`afterEntryPublish` Event, this allows developers to execute custom functionality after a new entry, pushed by Storychief, is saved in Craft.
+
+`afterEntryUpdate` Event, this allows developers to execute custom functionality after an update to an entry, pushed by Storychief, is saved in Craft.
+
+Both events send out a `EntrySaveEvent` with the saved `Entry` object as its property.
 
 
 Brought to you by [StoryChief](https://github.com/Story-Chief/)
