@@ -25,31 +25,11 @@ class EntriesStoryChiefFieldType implements StoryChiefFieldTypeInterface
             $fieldData = array($fieldData);
         }
 
-        // Get source id's for connecting
-        $sectionIds = array();
-        $sources = $field->sources;
-
-        if (is_array($sources)) {
-            foreach ($sources as $source) {
-                // When singles is selected as the only option to search in, it doesn't contain any ids...
-                if ($source == 'singles') {
-                    foreach (Craft::$app->sections->getAllSections() as $section) {
-                        $sectionIds[] = ($section->type == 'single') ? $section->id : '';
-                    }
-                } else {
-                    list($type, $id) = explode(':', $source);
-                    $sectionIds[] = $id;
-                }
-            }
-        } elseif ($sources === '*') {
-            $sectionIds = '*';
-        }
-
         // Find existing
         foreach ($fieldData as $entry) {
             $criteria = Entry::find();
             $criteria->status = null;
-            $criteria->sectionId = $sectionIds;
+            $criteria->sectionId = '*';
             $criteria->limit = $field->limit;
             $criteria->id = Db::escapeParam($entry);
             $elements = $criteria->ids();
