@@ -1,4 +1,3 @@
-<input type="hidden" name="redirect" id="redirect" value="{{ 'settings/plugins/storychief' }}">
 {% import "_includes/forms" as forms %}
 <h2>Connect</h2><a name="connect"></a>
 <p>Step 1: Connect your website to Story Chief</p>
@@ -132,6 +131,8 @@
 {% endif %}
 
 <script type="application/javascript">
-    document.getElementsByName('redirect')[0].value = 'settings/plugins/storychief';
+  document.getElementsByName('redirect').forEach(function (el) {
+    console.log('element');
+    el.value = "{{ 'settings/plugins/storychief-v3'|hash }}";
+  });
 </script>
-
