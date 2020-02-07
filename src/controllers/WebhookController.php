@@ -160,7 +160,7 @@ class WebhookController extends Controller
             $criteria->siteId = $site['id'];
             $entry = $criteria->first();
         }
-        
+
         $entry = $this->_map($entry);
         Craft::$app->elements->saveElement($entry);
 
@@ -250,7 +250,7 @@ class WebhookController extends Controller
                     if ($value) {
                         $scField = new $class();
                         if ($scField instanceof StoryChiefFieldTypeInterface) {
-                            $entry->$fieldHandle = $scField->prepFieldData($field, $value);
+                            $entry->setFieldValue($fieldHandle, $scField->prepFieldData($field, $value));
                         }
                     }
                 }
