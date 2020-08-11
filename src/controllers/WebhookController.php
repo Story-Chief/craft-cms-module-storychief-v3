@@ -30,7 +30,7 @@ class WebhookController extends Controller
         try {
             $body = @file_get_contents('php://input');
             $this->payload = json_decode($body, true);
-        
+
             if (!$this->validateCallback()) {
                 Craft::$app->getResponse()->setStatusCode(400);
                 return $this->asJson('Callback failed validation');
@@ -39,25 +39,30 @@ class WebhookController extends Controller
             $this->event = $this->payload['meta']['event'];
 
             switch ($this->event) {
-            case 'publish':
-                $response = $this->handlePublishEventType();
-                break;
-            case 'update':
-                $response = $this->handleUpdateEventType();
-                break;
-            case 'delete':
-                $response = $this->handleDeleteEventType();
-                break;
-            case 'test':
-                $response = $this->handleTestEventType();
-                break;
-            default:
-                $response = $this->handleMissingEventType();
-        }
+                case 'publish':
+                    $response = $this->handlePublishEventType();
+                    break;
+                case 'update':
+                    $response = $this->handleUpdateEventType();
+                    break;
+                case 'delete':
+                    $response = $this->handleDeleteEventType();
+                    break;
+                case 'test':
+                    $response = $this->handleTestEventType();
+                    break;
+                default:
+                    $response = $this->handleMissingEventType();
+            }
             return $this->asJson($response);
         } catch (\Exception $e) {
-            Craft::$app->getResponse()->setStatusCode(400);
-            return $this->asJson($e->getMessage());
+            Craft::$app->getResponse()->setStatusCode(500);
+            return $this->asJson([
+                'message' => $e->getMessage(),
+                'code'    => $e->getCode(),
+                'debug'   => $e->getFile() . ': line ' . $e->getLine(),
+                'trace'   => $e->getTraceAsString()
+            ]);
         }
     }
 
@@ -67,7 +72,7 @@ class WebhookController extends Controller
         if (!is_array($json)) {
             return false;
         }
-        
+
         $key = $this->settings['key'];
         $givenMac = $json['meta']['mac'];
         unset($json['meta']['mac']);
@@ -84,9 +89,9 @@ class WebhookController extends Controller
         $entry = new Entry();
         $entry->sectionId = $section;
         $entry->typeId = $entry_type;
- 
+
         $entry = $this->_map($entry);
-         
+
         // Set language
         // If language is set and there more than one language configure on CRAFT
         if (
@@ -99,7 +104,7 @@ class WebhookController extends Controller
             ->from('sites')
             ->where(['language' => $this->payload['data']['language'], 'groupId' => $entry->site->group->id])
             ->one();
-                
+
             $entry->siteId = $site['id'];
         }
         if ($this->payload['data']['source']) {
@@ -121,18 +126,16 @@ class WebhookController extends Controller
 
     protected function handlePublishTranslation()
     {
-        $criteria = \craft\elements\Entry::find();
-        $criteria->id = $this->payload['data']['source']['data']['external_id'];
-        $entry = $criteria->one();
-
-
-        $site =  (new \craft\db\Query())
+        $site = (new \craft\db\Query())
             ->select(['id'])
             ->from('sites')
-            ->where(['language' => $this->payload['data']['language'], 'groupId' => $entry->site->group->id])
+            ->where(['language' => $this->payload['data']['language']])
             ->one();
-                
+
+        $criteria = \craft\elements\Entry::find();
+        $criteria->id = $this->payload['data']['source']['data']['external_id'];
         $criteria->siteId = $site['id'];
+        $entry = $criteria->one();
 
         $entry = $this->_map($entry);
 
@@ -156,13 +159,13 @@ class WebhookController extends Controller
             ->from('sites')
             ->where(['language' => $this->payload['data']['language'], 'groupId' => $entry->site->group->id])
             ->one();
-                
+
             $criteria = \craft\elements\Entry::find();
             $criteria->id = $this->payload['data']['external_id'];
             $criteria->siteId = $site['id'];
             $entry = $criteria->first();
         }
-        
+
         $entry = $this->_map($entry);
         Craft::$app->elements->saveElement($entry);
 
@@ -252,7 +255,7 @@ class WebhookController extends Controller
                     if ($value) {
                         $scField = new $class();
                         if ($scField instanceof StoryChiefFieldTypeInterface) {
-                            $entry->$fieldHandle = $scField->prepFieldData($field, $value);
+                            $entry->setFieldValue($fieldHandle, $scField->prepFieldData($field, $value));
                         }
                     }
                 }
