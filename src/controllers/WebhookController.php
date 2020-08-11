@@ -105,6 +105,9 @@ class WebhookController extends Controller
             ->where(['language' => $this->payload['data']['language'], 'groupId' => $entry->site->group->id])
             ->one();
 
+            if (is_null($site)) {
+                throw new \Exception("Could not find a site with language " . $this->payload['data']['language']);
+            }
             $entry->siteId = $site['id'];
         }
         if ($this->payload['data']['source']) {
