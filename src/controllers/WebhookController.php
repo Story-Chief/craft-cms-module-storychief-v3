@@ -39,25 +39,30 @@ class WebhookController extends Controller
             $this->event = $this->payload['meta']['event'];
 
             switch ($this->event) {
-            case 'publish':
-                $response = $this->handlePublishEventType();
-                break;
-            case 'update':
-                $response = $this->handleUpdateEventType();
-                break;
-            case 'delete':
-                $response = $this->handleDeleteEventType();
-                break;
-            case 'test':
-                $response = $this->handleTestEventType();
-                break;
-            default:
-                $response = $this->handleMissingEventType();
-        }
+                case 'publish':
+                    $response = $this->handlePublishEventType();
+                    break;
+                case 'update':
+                    $response = $this->handleUpdateEventType();
+                    break;
+                case 'delete':
+                    $response = $this->handleDeleteEventType();
+                    break;
+                case 'test':
+                    $response = $this->handleTestEventType();
+                    break;
+                default:
+                    $response = $this->handleMissingEventType();
+            }
             return $this->asJson($response);
         } catch (\Exception $e) {
-            Craft::$app->getResponse()->setStatusCode(400);
-            return $this->asJson($e->getMessage());
+            Craft::$app->getResponse()->setStatusCode(500);
+            return $this->asJson([
+                'message' => $e->getMessage(),
+                'code'    => $e->getCode(),
+                'debug'   => $e->getFile() . ': line ' . $e->getLine(),
+                'trace'   => $e->getTraceAsString()
+            ]);
         }
     }
 
