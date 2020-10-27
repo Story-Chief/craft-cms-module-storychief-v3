@@ -1,4 +1,5 @@
 <?php
+
 namespace storychief\storychiefv3\controllers;
 
 use craft;
@@ -10,19 +11,23 @@ use storychief\storychiefv3\events\EntrySaveEvent;
 
 class WebhookController extends Controller
 {
-    const EVENT_AFTER_ENTRY_PUBLISH = "afterEntryPublish";
-    const EVENT_AFTER_ENTRY_UPDATE = "afterEntryUpdate";
+    protected $settings = null;
+    protected $payload = null;
+    protected $group = null;
+    protected $propagationMethod = null;
 
     protected $allowAnonymous = true;
-    protected $settings = null;
-    protected $event = null;
-    protected $payload = null;
     public $enableCsrfValidation = false;
 
     public function __construct($id, $module = null)
     {
         parent::__construct($id, $module);
         $this->settings = Craft::$app->plugins->getPlugin('storychief-v3')->getSettings();
+        $entry = new Entry();
+        $entry->sectionId = $this->settings['section'];
+        $entry->typeId = $this->settings['entry_type'];
+        $this->group = $entry->site->group;
+        $this->propagationMethod = $entry->section->propagationMethod;
     }
 
     public function actionCallback()
@@ -36,9 +41,8 @@ class WebhookController extends Controller
                 return $this->asJson('Callback failed validation');
             }
 
-            $this->event = $this->payload['meta']['event'];
 
-            switch ($this->event) {
+            switch ($this->payload['meta']['event']) {
                 case 'publish':
                     $response = $this->handlePublishEventType();
                     break;
@@ -49,10 +53,9 @@ class WebhookController extends Controller
                     $response = $this->handleDeleteEventType();
                     break;
                 case 'test':
+                default:
                     $response = $this->handleTestEventType();
                     break;
-                default:
-                    $response = $this->handleMissingEventType();
             }
             return $this->asJson($response);
         } catch (\Exception $e) {
@@ -83,43 +86,63 @@ class WebhookController extends Controller
 
     protected function handlePublishEventType()
     {
-        $section = $this->settings['section'];
-        $entry_type = $this->settings['entry_type'];
+        $site = $this->_getSiteForLanguage();
 
-        $entry = new Entry();
-        $entry->sectionId = $section;
-        $entry->typeId = $entry_type;
+        // It's a translation && craft is setup to work with propagated translations
+        if (
+            $site
+            && $this->payload['data']['source']
+            && $this->propagationMethod !== "none"
+        ) {
 
+            // if entry exists (disabled for example)
+            $criteria = \craft\elements\Entry::find();
+            $criteria->anyStatus();
+            $criteria->id = $this->payload['data']['source']['data']['external_id'];
+            $criteria->siteId = $site['id'];
+            $result = $criteria->one();
+
+            if ($result) { // if entry exists make sure it is enabled
+                $entry = $result;
+                $entry->setEnabledForSite(true);
+                Craft::$app->elements->saveElement($entry);
+            } else { // create it
+                $source_site = $this->_getSiteForLanguage($this->payload['data']['source']['data']['language']);
+                $criteria = \craft\elements\Entry::find();
+                $criteria->id = $this->payload['data']['source']['data']['external_id'];
+                $criteria->siteId = $source_site['id'];
+                $entry = $criteria->one();
+
+                $entry->siteId = $site['id'];
+                $entry->setEnabledForSite(true);
+                Craft::$app->elements->saveElement($entry);
+            }
+
+            $criteria = \craft\elements\Entry::find();
+            $criteria->id = $this->payload['data']['source']['data']['external_id'];
+            $criteria->siteId = $site['id'];
+            $result = $criteria->one();
+            $entry = $result;
+        } else {
+            $entry = new Entry();
+            $entry->sectionId = $this->settings['section'];
+            $entry->typeId = $this->settings['entry_type'];
+
+            if ($this->_isLanguageSetInPayload() && $site) {
+                $entry->siteId = $site['id'];
+            }
+        }
+
+        // Set a default slug, will be overwritten in _map if an SEO slug is set.
+        $entry->slug = craft\helpers\ElementHelper::generateSlug($this->payload['data']['title']);
+
+        // Map all other fields
         $entry = $this->_map($entry);
 
-        // Set language
-        // If language is set and there more than one language configure on CRAFT
-        if (
-            isset($this->payload['data']['language']) &&
-            $this->payload['data']['language'] &&
-            is_array($entry->site->group->sites) &&
-            sizeof($entry->site->group->sites) > 1) {
-            $site =  (new \craft\db\Query())
-            ->select(['id'])
-            ->from('sites')
-            ->where(['language' => $this->payload['data']['language'], 'groupId' => $entry->site->group->id])
-            ->one();
-
-            if (is_null($site)) {
-                throw new \Exception("Could not find a site with language " . $this->payload['data']['language']);
-            }
-            $entry->siteId = $site['id'];
-        }
-        if ($this->payload['data']['source']) {
-            $entry = $this->handlePublishTranslation();
-        }
         Craft::$app->elements->saveElement($entry);
 
         // Trigger after publish event.
-        $event = new EntrySaveEvent([
-            'entry' => $entry
-        ]);
-        $this->trigger(self::EVENT_AFTER_ENTRY_PUBLISH, $event);
+        $this->trigger('afterEntryPublish', new EntrySaveEvent(['entry' => $entry]));
 
         return $this->_appendMac([
             'id'        => $entry->id,
@@ -127,56 +150,21 @@ class WebhookController extends Controller
         ]);
     }
 
-    protected function handlePublishTranslation()
-    {
-        $site = (new \craft\db\Query())
-            ->select(['id'])
-            ->from('sites')
-            ->where(['language' => $this->payload['data']['language']])
-            ->one();
-
-        $criteria = \craft\elements\Entry::find();
-        $criteria->id = $this->payload['data']['source']['data']['external_id'];
-        $criteria->siteId = $site['id'];
-        $entry = $criteria->one();
-
-        $entry = $this->_map($entry);
-
-        return $entry;
-    }
-
     protected function handleUpdateEventType()
     {
         $criteria = \craft\elements\Entry::find();
         $criteria->id = $this->payload['data']['external_id'];
-        $entry = $criteria->first();
-
-        // Set language
-        if (
-            isset($this->payload['data']['language']) &&
-            $this->payload['data']['language'] &&
-            is_array($entry->site->group->sites) &&
-            sizeof($entry->site->group->sites) > 1) {
-            $site =  (new \craft\db\Query())
-            ->select(['id'])
-            ->from('sites')
-            ->where(['language' => $this->payload['data']['language'], 'groupId' => $entry->site->group->id])
-            ->one();
-
-            $criteria = \craft\elements\Entry::find();
-            $criteria->id = $this->payload['data']['external_id'];
+        if ($this->_isLanguageSetInPayload() && $site = $this->_getSiteForLanguage()) {
             $criteria->siteId = $site['id'];
-            $entry = $criteria->first();
         }
+        $entry = $criteria->one();
 
         $entry = $this->_map($entry);
+
         Craft::$app->elements->saveElement($entry);
 
         // Trigger after update event.
-        $event = new EntrySaveEvent([
-            'entry' => $entry
-        ]);
-        $this->trigger(self::EVENT_AFTER_ENTRY_UPDATE, $event);
+        $this->trigger('afterEntryUpdate', new EntrySaveEvent(['entry' => $entry]));
 
         return $this->_appendMac([
             'id'        => $entry->id,
@@ -186,7 +174,23 @@ class WebhookController extends Controller
 
     protected function handleDeleteEventType()
     {
-        Craft::$app->getElements()->deleteElementById($this->payload['data']['external_id']);
+        $criteria = \craft\elements\Entry::find();
+        $criteria->id = $this->payload['data']['external_id'];
+        if ($this->_isLanguageSetInPayload() && $site = $this->_getSiteForLanguage()) {
+            $criteria->siteId = $site['id'];
+        }
+        $entry = $criteria->one();
+
+        $entry->setEnabledForSite(false);
+        Craft::$app->elements->saveElement($entry);
+
+        // hard delete if all versions are disabled
+        $criteria = \craft\elements\Entry::find();
+        $criteria->id = $this->payload['data']['external_id'];
+        $entry = $criteria->one();
+        if (!$entry) {
+            Craft::$app->elements->deleteElementById($this->payload['data']['external_id']);
+        }
 
         return '';
     }
@@ -207,12 +211,6 @@ class WebhookController extends Controller
         return '';
     }
 
-    protected function handleMissingEventType()
-    {
-        return '';
-    }
-
-    // map data to entry
     private function _map(Entry $entry)
     {
         $mapping = $this->settings['mapping'];
@@ -235,7 +233,7 @@ class WebhookController extends Controller
                 Craft::$app->getElements()->saveElement($user, false);
             }
             if (!is_null($user)) {
-                $entry->authorId =  $user->id;
+                $entry->authorId = $user->id;
             }
         }
         unset($mapping['author']);
@@ -252,7 +250,8 @@ class WebhookController extends Controller
         foreach ($mapping as $fieldHandle => $scHandle) {
             if (!empty($scHandle)) {
                 $field = Craft::$app->fields->getFieldByHandle($fieldHandle);
-                $class = str_replace('craft\\fields', '\\storychief\\storychiefv3\\storychief\\FieldTypes', get_class($field)).'StoryChiefFieldType';
+                $class = str_replace('craft\\fields', '\\storychief\\storychiefv3\\storychief\\FieldTypes',
+                        get_class($field)) . 'StoryChiefFieldType';
                 if (class_exists($class)) {
                     $value = $this->_filterPayloadData($scHandle);
                     if ($value) {
@@ -268,7 +267,6 @@ class WebhookController extends Controller
         return $entry;
     }
 
-    // append MAC to a response
     private function _appendMac($response)
     {
         $key = $this->settings['key'];
@@ -277,7 +275,6 @@ class WebhookController extends Controller
         return $response;
     }
 
-    // returns string value or array of strings values (select or checkboxes)
     private function _filterPayloadData($scHandle)
     {
         switch ($scHandle) {
@@ -316,7 +313,6 @@ class WebhookController extends Controller
         }
     }
 
-    // returns string value or array of strings values (select or checkboxes)
     private function _filterPayloadCustomData($scHandle)
     {
         $cfd = $this->settings['custom_field_definitions'];
@@ -333,5 +329,24 @@ class WebhookController extends Controller
             default:
                 return $this->payload['data']['custom_fields'][$found_value_key]['value'];
         }
+    }
+
+    private function _isLanguageSetInPayload()
+    {
+        return (
+            isset($this->payload['data']['language'])
+            && $this->payload['data']['language']
+        );
+    }
+
+    private function _getSiteForLanguage($language = null)
+    {
+        return (new \craft\db\Query())
+            ->select(['id'])
+            ->from('sites')
+            ->where([
+                'language' => $language ?: $this->payload['data']['language'],
+                'groupId' => $this->group->id])
+            ->one();
     }
 }
