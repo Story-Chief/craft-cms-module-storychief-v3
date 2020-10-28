@@ -1,6 +1,7 @@
 <?php namespace storychief\storychiefv3\storychief\FieldTypes;
 
-use  craft\base\Field;
+use craft\base\Field;
+use storychief\storychiefv3\storychief\Helpers\StoryChiefHelper;
 
 class LightswitchStoryChiefFieldType implements StoryChiefFieldTypeInterface
 {
