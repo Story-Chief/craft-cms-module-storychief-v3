@@ -1,4 +1,4 @@
-<?php namespace storychief\storychiefv3\helpers;
+<?php namespace storychief\storychiefv3\storychief\Helpers;
 
 class StoryChiefHelper
 {
