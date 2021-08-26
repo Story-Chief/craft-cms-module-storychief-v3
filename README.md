@@ -45,14 +45,56 @@ Finally, back to your StoryChief CRAFT CMS channel configuration, fill up your C
 :)
 
 ## Events
-(Note: this is mostly for developers that know basic PHP and Composer Packages)
 
-`afterEntryPublish` Event, this allows developers to execute custom functionality after a new entry, pushed by Storychief, is saved in Craft.
+Note: this is mostly for developers that know basic PHP and Composer Packages.
 
-`afterEntryUpdate` Event, this allows developers to execute custom functionality after an update to an entry, pushed by Storychief, is saved in Craft.
+### `beforeEntryPublish` and `beforeEntryUpdate` event
+
+This allows developers to execute custom functionality before saving a new or updating an entry, to modify data of a 
+new entry.
+
+```php 
+
+use storychief\storychiefv3\events\EntryPublishEvent;
+
+$this->on('beforeEntryPublish', function (EntryPublishEvent $event) {
+    $payload = $event->payload;
+    $settings = $event->settings;
+    $entry = $event->entry;
+    
+    // Example 1:
+    $entry->sectionId = 2; // BLog
+    $entry->typeId = 2;
+    
+    // Example 2:
+    if ($payload['data']['custom_fields']) {
+        foreach ($payload['data']['custom_fields'] as $customField) {
+            if ($customField['key'] === 'custom_field_name') {                
+                $entry->sectionId = $customField['value'];
+                $entry->typeId = 2;
+            }
+        }
+    }
+});
+
+use storychief\storychiefv3\events\EntryUpdateEvent;
+
+$this->on('beforeEntryUpdate', function (EntryUpdateEvent $event) {
+    // ...
+});
+```
+
+### `afterEntryPublish` event
+
+This allows developers to execute custom functionality after a new entry, pushed by Storychief, is saved in Craft.
+
+### `afterEntryUpdate` event
+
+This allows developers to execute custom functionality after an update to an entry, pushed by Storychief, is saved in Craft.
 
 Both events send out a `EntrySaveEvent` with the saved `Entry` object as its property.
 
+---
 
 Brought to you by [StoryChief](https://github.com/Story-Chief/)
 
