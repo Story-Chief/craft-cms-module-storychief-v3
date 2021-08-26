@@ -7,6 +7,8 @@ use yii\web\Controller;
 use craft\elements\Entry;
 use craft\elements\User;
 use storychief\storychiefv3\storychief\FieldTypes\StoryChiefFieldTypeInterface;
+use storychief\storychiefv3\events\EntryPublishEvent;
+use storychief\storychiefv3\events\EntryUpdateEvent;
 use storychief\storychiefv3\events\EntrySaveEvent;
 
 class WebhookController extends Controller
@@ -139,6 +141,18 @@ class WebhookController extends Controller
         // Map all other fields
         $entry = $this->_map($entry);
 
+        // Trigger event to alter the entry before saving
+        $this->trigger(
+            'beforeEntryPublish',
+            new EntryPublishEvent(
+                [
+                    'payload' => $this->payload,
+                    'settings' => $this->settings,
+                    'entry' => $entry,
+                ]
+            )
+        );
+
         Craft::$app->elements->saveElement($entry);
 
         // Trigger after publish event.
@@ -160,6 +174,18 @@ class WebhookController extends Controller
         $entry = $criteria->one();
 
         $entry = $this->_map($entry);
+
+        // Trigger event to alter the entry before saving
+        $this->trigger(
+            'beforeEntryUpdate',
+            new EntryUpdateEvent(
+                [
+                    'payload' => $this->payload,
+                    'settings' => $this->settings,
+                    'entry' => $entry,
+                ]
+            )
+        );
 
         Craft::$app->elements->saveElement($entry);
 
