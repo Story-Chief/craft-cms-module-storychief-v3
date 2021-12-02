@@ -32,7 +32,7 @@ class TagsStoryChiefFieldType implements StoryChiefFieldTypeInterface
 
         $tagGroup =  (new \craft\db\Query())
         ->select(['id'])
-        ->from('taggroups')
+        ->from('{{%taggroups}}')
         ->where(['uid' => $groupUid])
         ->one();
 
