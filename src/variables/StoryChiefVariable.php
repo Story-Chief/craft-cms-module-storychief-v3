@@ -3,6 +3,7 @@ namespace storychief\storychiefv3\variables;
 
 use storychief\storychiefv3\storychief\FieldTypes\RichTextStoryChiefFieldType;
 use storychief\storychiefv3\storychief\FieldTypes\StoryChiefFieldTypeInterface;
+use storychief\storychiefv3\storychief\Helpers\StoryChiefHelper;
 use craft;
 
 class StoryChiefVariable
@@ -71,7 +72,7 @@ class StoryChiefVariable
     public function getStoryChiefFieldOptions($fieldHandle)
     {
         $field = \Craft::$app->fields->getFieldByHandle($fieldHandle);
-        $class = $this->getStoryChiefFieldClass($field);
+        $class = StoryChiefHelper::getStoryChiefFieldClass($field);
 
         if (!$class || !class_exists($class)) {
             return null;
@@ -144,18 +145,5 @@ class StoryChiefVariable
             $fieldDefinitions[] = $fieldDefinition;
         }
         return $fieldDefinitions;
-    }
-
-    private function getStoryChiefFieldClass($field)
-    {
-        if (!$field) {
-            return null;
-        }
-
-        if (class_exists(craft\redactor\Field::class) && $field instanceof craft\redactor\Field) {
-            return RichTextStoryChiefFieldType::class;
-        }
-
-        return str_replace('craft\\fields', '\\storychief\\storychiefv3\\storychief\\FieldTypes', get_class($field)) . 'StoryChiefFieldType';
     }
 }

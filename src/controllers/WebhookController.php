@@ -3,6 +3,7 @@
 namespace storychief\storychiefv3\controllers;
 
 use craft;
+use storychief\storychiefv3\storychief\Helpers\StoryChiefHelper;
 use yii\web\Controller;
 use craft\elements\Entry;
 use craft\elements\User;
@@ -274,19 +275,23 @@ class WebhookController extends Controller
 
         // map other fields
         foreach ($mapping as $fieldHandle => $scHandle) {
-            if (!empty($scHandle)) {
-                $field = Craft::$app->fields->getFieldByHandle($fieldHandle);
-                $class = str_replace('craft\\fields', '\\storychief\\storychiefv3\\storychief\\FieldTypes',
-                        get_class($field)) . 'StoryChiefFieldType';
-                if (class_exists($class)) {
-                    $value = $this->_filterPayloadData($scHandle);
-                    if ($value) {
-                        $scField = new $class();
-                        if ($scField instanceof StoryChiefFieldTypeInterface) {
-                            $entry->setFieldValue($fieldHandle, $scField->prepFieldData($field, $value));
-                        }
-                    }
-                }
+            if (empty($scHandle)) {
+                continue;
+            }
+            $field = Craft::$app->fields->getFieldByHandle($fieldHandle);
+            $class = StoryChiefHelper::getStoryChiefFieldClass($field);
+            if (!class_exists($class)) {
+                continue;
+            }
+
+            $value = $this->_filterPayloadData($scHandle);
+            if (!$value) {
+                continue;
+            }
+
+            $scField = new $class();
+            if ($scField instanceof StoryChiefFieldTypeInterface) {
+                $entry->setFieldValue($fieldHandle, $scField->prepFieldData($field, $value));
             }
         }
 

@@ -1,5 +1,7 @@
 <?php namespace storychief\storychiefv3\storychief\Helpers;
 
+use storychief\storychiefv3\storychief\FieldTypes\RichTextStoryChiefFieldType;
+
 class StoryChiefHelper
 {
     public static function parseBoolean($value)
@@ -37,5 +39,18 @@ class StoryChiefHelper
         }
 
         return $result;
+    }
+
+    public static function getStoryChiefFieldClass($field)
+    {
+        if (!$field) {
+            return null;
+        }
+
+        if (class_exists(\craft\redactor\Field::class) && $field instanceof \craft\redactor\Field) {
+            return RichTextStoryChiefFieldType::class;
+        }
+
+        return str_replace('craft\\fields', '\\storychief\\storychiefv3\\storychief\\FieldTypes', get_class($field)) . 'StoryChiefFieldType';
     }
 }
