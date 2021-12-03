@@ -174,6 +174,11 @@ class WebhookController extends Controller
         }
         $entry = $criteria->one();
 
+        // maybe the blog post was deleted from Craft
+        if (!$entry) {
+            return $this->handlePublishEventType();
+        }
+
         $entry = $this->_map($entry);
 
         // Trigger event to alter the entry before saving
