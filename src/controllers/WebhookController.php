@@ -168,6 +168,7 @@ class WebhookController extends Controller
     protected function handleUpdateEventType()
     {
         $criteria = \craft\elements\Entry::find();
+        $criteria->anyStatus();
         $criteria->id = $this->payload['data']['external_id'];
         if ($this->_isLanguageSetInPayload() && $site = $this->_getSiteForLanguage()) {
             $criteria->siteId = $site['id'];
@@ -207,6 +208,7 @@ class WebhookController extends Controller
     protected function handleDeleteEventType()
     {
         $criteria = \craft\elements\Entry::find();
+        $criteria->anyStatus();
         $criteria->id = $this->payload['data']['external_id'];
         if ($this->_isLanguageSetInPayload() && $site = $this->_getSiteForLanguage()) {
             $criteria->siteId = $site['id'];
