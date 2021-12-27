@@ -2,6 +2,7 @@
 namespace storychief\storychiefv3\variables;
 
 use storychief\storychiefv3\storychief\FieldTypes\StoryChiefFieldTypeInterface;
+use storychief\storychiefv3\storychief\Helpers\StoryChiefHelper;
 use craft;
 
 class StoryChiefVariable
@@ -60,7 +61,7 @@ class StoryChiefVariable
                 'type'  => 'textarea',
             ],
         ];
-        
+
         $settings = Craft::$app->plugins->getPlugin('storychief-v3')->getSettings();
         $custom_fields = $settings['custom_field_definitions'];
 
@@ -70,21 +71,27 @@ class StoryChiefVariable
     public function getStoryChiefFieldOptions($fieldHandle)
     {
         $field = \Craft::$app->fields->getFieldByHandle($fieldHandle);
-        $class = str_replace('craft\\fields', '\\storychief\\storychiefv3\\storychief\\FieldTypes', get_class($field)).'StoryChiefFieldType';
+        $class = StoryChiefHelper::getStoryChiefFieldClass($field);
+
+        if (!$class || !class_exists($class)) {
+            return null;
+        }
+
+        $scField = new $class();
+        if (!$scField instanceof StoryChiefFieldTypeInterface) {
+            return null;
+        }
+
         $allFields = $this->getAllStoryChiefFields();
+        $supportedTypes = $scField->supportedStorychiefFieldTypes();
         $options = [];
-        if (class_exists($class)) {
-            $field = new $class();
-            if ($field instanceof StoryChiefFieldTypeInterface) {
-                $supportedTypes = $field->supportedStorychiefFieldTypes();
-                foreach ($allFields as $item) {
-                    if (in_array($item['type'], $supportedTypes)) {
-                        $options[] = [
-                            'label' => $item['label'],
-                            'value' => $item['name'],
-                        ];
-                    }
-                }
+
+        foreach ($allFields as $item) {
+            if (in_array($item['type'], $supportedTypes, true)) {
+                $options[] = [
+                  'label' => $item['label'],
+                  'value' => $item['name'],
+                ];
             }
         }
 
