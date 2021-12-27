@@ -22,7 +22,7 @@ class CategoriesStoryChiefFieldType implements StoryChiefFieldTypeInterface
         $categoryGroupUID = str_replace('group:', '', $field->source);
         $categoryGroup =  (new \craft\db\Query())
         ->select(['id'])
-        ->from('categorygroups')
+        ->from('{{%categorygroups}}')
         ->where(['uid' => $categoryGroupUID])
         ->one();
 
@@ -36,7 +36,7 @@ class CategoriesStoryChiefFieldType implements StoryChiefFieldTypeInterface
         $i = 0;
         while ($i < $limit) {
             $categoryName = $fieldData[$i];
-            
+
             $criteria = Category::find();
             $criteria->groupId = $categoryGroupID;
             $criteria->title = Db::escapeParam($categoryName);

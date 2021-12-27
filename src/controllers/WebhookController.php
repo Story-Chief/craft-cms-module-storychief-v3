@@ -369,7 +369,7 @@ class WebhookController extends Controller
     {
         return (new \craft\db\Query())
             ->select(['id'])
-            ->from('sites')
+            ->from('{{%sites}}')
             ->where([
                 'language' => $language ?: $this->payload['data']['language'],
                 'groupId' => $this->group->id])
