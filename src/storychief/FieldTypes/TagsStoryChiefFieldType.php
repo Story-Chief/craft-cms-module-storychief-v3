@@ -26,13 +26,13 @@ class TagsStoryChiefFieldType implements StoryChiefFieldTypeInterface
         if (!is_array($fieldData)) {
             $fieldData = array($fieldData);
         }
-        
+
         $source = $field->source;
         list($type, $groupUid) = explode(':', $source);
 
         $tagGroup =  (new \craft\db\Query())
         ->select(['id'])
-        ->from('taggroups')
+        ->from('{{%taggroups}}')
         ->where(['uid' => $groupUid])
         ->one();
 
@@ -45,7 +45,7 @@ class TagsStoryChiefFieldType implements StoryChiefFieldTypeInterface
             $criteria->status = null;
             $criteria->groupId = $groupId;
             $criteria->title = Db::escapeParam($tagName);
-            
+
             $elements = $criteria->ids();
 
             $preppedData = array_merge($preppedData, $elements);

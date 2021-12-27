@@ -10,6 +10,7 @@ use storychief\storychiefv3\storychief\FieldTypes\StoryChiefFieldTypeInterface;
 use storychief\storychiefv3\events\EntryPublishEvent;
 use storychief\storychiefv3\events\EntryUpdateEvent;
 use storychief\storychiefv3\events\EntrySaveEvent;
+use storychief\storychiefv3\storychief\Helpers\StoryChiefHelper;
 
 class WebhookController extends Controller
 {
@@ -167,6 +168,7 @@ class WebhookController extends Controller
     protected function handleUpdateEventType()
     {
         $criteria = \craft\elements\Entry::find();
+        $criteria->anyStatus();
         $criteria->id = $this->payload['data']['external_id'];
         if ($this->_isLanguageSetInPayload() && $site = $this->_getSiteForLanguage()) {
             $criteria->siteId = $site['id'];
@@ -201,6 +203,7 @@ class WebhookController extends Controller
     protected function handleDeleteEventType()
     {
         $criteria = \craft\elements\Entry::find();
+        $criteria->anyStatus();
         $criteria->id = $this->payload['data']['external_id'];
         if ($this->_isLanguageSetInPayload() && $site = $this->_getSiteForLanguage()) {
             $criteria->siteId = $site['id'];
@@ -274,19 +277,25 @@ class WebhookController extends Controller
 
         // map other fields
         foreach ($mapping as $fieldHandle => $scHandle) {
-            if (!empty($scHandle)) {
-                $field = Craft::$app->fields->getFieldByHandle($fieldHandle);
-                $class = str_replace('craft\\fields', '\\storychief\\storychiefv3\\storychief\\FieldTypes',
-                        get_class($field)) . 'StoryChiefFieldType';
-                if (class_exists($class)) {
-                    $value = $this->_filterPayloadData($scHandle);
-                    if ($value) {
-                        $scField = new $class();
-                        if ($scField instanceof StoryChiefFieldTypeInterface) {
-                            $entry->setFieldValue($fieldHandle, $scField->prepFieldData($field, $value));
-                        }
-                    }
-                }
+            if (empty($scHandle)) {
+                continue;
+            }
+
+            $field = Craft::$app->fields->getFieldByHandle($fieldHandle);
+            $class = StoryChiefHelper::getStoryChiefFieldClass($field);
+
+            if (!class_exists($class)) {
+                continue;
+            }
+
+            $value = $this->_filterPayloadData($scHandle);
+            if (!$value) {
+                continue;
+            }
+
+            $scField = new $class();
+            if ($scField instanceof StoryChiefFieldTypeInterface) {
+                $entry->setFieldValue($fieldHandle, $scField->prepFieldData($field, $value));
             }
         }
 
@@ -369,7 +378,7 @@ class WebhookController extends Controller
     {
         return (new \craft\db\Query())
             ->select(['id'])
-            ->from('sites')
+            ->from('{{%sites}}')
             ->where([
                 'language' => $language ?: $this->payload['data']['language'],
                 'groupId' => $this->group->id])
