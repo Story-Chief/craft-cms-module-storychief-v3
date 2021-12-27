@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.0.10 - 2021-12-27
+### Fixed
+- Fixed queries with table prefix (e.g. `craft_`).
+### Added
+- Support for Redactor fields
+
 ## 1.0.9 - 2021-08-26
 ### Added
 - Added beforeEntryPublish and beforeEntryUpdate events which allow altering of the entry before it is saved.
