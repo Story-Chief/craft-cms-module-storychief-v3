@@ -4,6 +4,7 @@ use Craft;
 use  craft\base\Field;
 use craft\elements\Asset;
 use craft\helpers\Assets;
+use craft\errors\VolumeObjectExistsException;
 
 class AssetsStoryChiefFieldType implements StoryChiefFieldTypeInterface
 {
@@ -28,6 +29,7 @@ class AssetsStoryChiefFieldType implements StoryChiefFieldTypeInterface
         $volumeID = Craft::$app->getVolumes()->getVolumeByUid($volumeUID)->id;
         $folderID = Craft::$app->assets->getRootFolderByVolumeId($volumeID)->id;
 
+
         $preppedData = [];
 
         // get remote image and store in temp path
@@ -46,7 +48,20 @@ class AssetsStoryChiefFieldType implements StoryChiefFieldTypeInterface
         $asset->folderPath = $subPath;
         $asset->avoidFilenameConflicts = true;
 
-        $response = Craft::$app->elements->saveElement($asset);
+        try {
+            $response = Craft::$app->elements->saveElement($asset);
+        } catch(VolumeObjectExistsException $e) {
+            // Try again by renaming the filename to something unique, this can happen when the volume is using AWS S3
+            $asset = new Asset();
+            $asset->tempFilePath = $tempPath;
+            $asset->filename = Assets::prepareAssetName($imageInfo['filename'] . '-' . bin2hex(random_bytes(10)) . '.' . $imageInfo['extension']);
+            $asset->volumeId = $volumeID;
+            $asset->folderId = $folderID;
+            $asset->folderPath = $subPath;
+            $asset->avoidFilenameConflicts = true;
+
+            $response = Craft::$app->elements->saveElement($asset);
+        }
 
         // if the response is a success, get the file id
         if ($response) {
