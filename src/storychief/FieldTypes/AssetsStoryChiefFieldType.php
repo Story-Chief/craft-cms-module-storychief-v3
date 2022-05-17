@@ -4,8 +4,6 @@ use Craft;
 use  craft\base\Field;
 use craft\elements\Asset;
 use craft\helpers\Assets;
-use craft\base\FlysystemVolume;
-use League\Flysystem\Filesystem;
 
 class AssetsStoryChiefFieldType implements StoryChiefFieldTypeInterface
 {
@@ -27,7 +25,6 @@ class AssetsStoryChiefFieldType implements StoryChiefFieldTypeInterface
             $subPath = $field['defaultUploadLocationSubpath'];
         }
 
-        /** @var FlysystemVolume $volume */
         $volumeID = Craft::$app->getVolumes()->getVolumeByUid($volumeUID)->id;
         $folderID = Craft::$app->assets->getRootFolderByVolumeId($volumeID)->id;
 
