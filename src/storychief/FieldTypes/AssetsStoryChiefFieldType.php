@@ -4,7 +4,8 @@ use Craft;
 use  craft\base\Field;
 use craft\elements\Asset;
 use craft\helpers\Assets;
-use craft\errors\VolumeObjectExistsException;
+use craft\base\FlysystemVolume;
+use League\Flysystem\Filesystem;
 
 class AssetsStoryChiefFieldType implements StoryChiefFieldTypeInterface
 {
@@ -26,45 +27,44 @@ class AssetsStoryChiefFieldType implements StoryChiefFieldTypeInterface
             $subPath = $field['defaultUploadLocationSubpath'];
         }
 
+        /** @var FlysystemVolume $volume */
         $volumeID = Craft::$app->getVolumes()->getVolumeByUid($volumeUID)->id;
         $folderID = Craft::$app->assets->getRootFolderByVolumeId($volumeID)->id;
 
-
-        $preppedData = [];
+        $preppedData = [];        
 
         // get remote image and store in temp path
         $imageInfo = pathinfo($fieldData);
         $tempPath = Craft::$app->getPath()->getTempPath() . DIRECTORY_SEPARATOR . $imageInfo['basename'];
-
-        file_put_contents($tempPath, fopen($fieldData, 'r'));
-
         $filename = Assets::prepareAssetName($imageInfo['basename']);
 
-        $asset = new Asset();
-        $asset->tempFilePath = $tempPath;
-        $asset->filename = $filename;
-        $asset->volumeId = $volumeID;
-        $asset->folderId = $folderID;
-        $asset->folderPath = $subPath;
-        $asset->avoidFilenameConflicts = true;
+        // Look if the filename already exists and so the existing asset
+        $asset = Asset::find()->where(
+            [
+                'assets.volumeID' => $volumeID, 
+                'assets.folderId' => $folderID, 
+                'assets.filename' => $filename
+            ]
+        )->one();
 
-        try {
-            $response = Craft::$app->elements->saveElement($asset);
-        } catch(VolumeObjectExistsException $e) {
-            // Try again by renaming the filename to something unique, this can happen when the volume is using AWS S3
+        if (!$asset) {            
+            file_put_contents($tempPath, fopen($fieldData, 'r'));
+
             $asset = new Asset();
             $asset->tempFilePath = $tempPath;
-            $asset->filename = Assets::prepareAssetName($imageInfo['filename'] . '-' . bin2hex(random_bytes(10)) . '.' . $imageInfo['extension']);
+            $asset->filename = $filename;
             $asset->volumeId = $volumeID;
             $asset->folderId = $folderID;
             $asset->folderPath = $subPath;
             $asset->avoidFilenameConflicts = true;
 
-            $response = Craft::$app->elements->saveElement($asset);
+            if (!Craft::$app->elements->saveElement($asset)) {
+                $asset = null; // The response failed
+            }
         }
 
-        // if the response is a success, get the file id
-        if ($response) {
+        // Get the file id
+        if ($asset) {
             $preppedData[] = $asset->id;
         }
 
