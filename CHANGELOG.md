@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.0.11 - 2022-05-18
+### Fixed
+- Fixed file updates with S3 file system
+
 ## 1.0.10 - 2021-12-27
 ### Fixed
 - Fixed queries with table prefix (e.g. `craft_`).
