@@ -1,5 +1,6 @@
 <?php namespace storychief\storychiefv3\storychief\Helpers;
 
+use Craft;
 use craft\fields\Assets;
 use craft\fields\Categories;
 use craft\fields\Checkboxes;
@@ -33,28 +34,28 @@ class StoryChiefHelper
         $result = filter_var($value, FILTER_VALIDATE_BOOLEAN);
 
         // Also check for translated values of boolean-like terms
-        if (strtolower($value) === Craft::t('yes')) {
+        if (strtolower($value) === Craft::t('app', 'yes')) {
             $result = true;
         }
 
-        if (strtolower($value) === Craft::t('on')) {
+        if (strtolower($value) === Craft::t('app', 'on')) {
             $result = true;
         }
 
-        if (strtolower($value) === Craft::t('open')) {
+        if (strtolower($value) === Craft::t('app', 'open')) {
             $result = true;
         }
 
 
-        if (strtolower($value) === Craft::t('no')) {
+        if (strtolower($value) === Craft::t('app', 'no')) {
             $result = false;
         }
 
-        if (strtolower($value) === Craft::t('off')) {
+        if (strtolower($value) === Craft::t('app', 'off')) {
             $result = false;
         }
 
-        if (strtolower($value) === Craft::t('closed')) {
+        if (strtolower($value) === Craft::t('app', 'closed')) {
             $result = false;
         }
 
