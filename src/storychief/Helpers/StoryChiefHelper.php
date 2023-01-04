@@ -1,4 +1,6 @@
-<?php namespace storychief\storychiefv3\storychief\Helpers;
+<?php
+
+namespace storychief\storychief\storychief\Helpers;
 
 use Craft;
 use craft\fields\Assets;
@@ -11,17 +13,17 @@ use craft\fields\MultiSelect;
 use craft\fields\PlainText;
 use craft\fields\RadioButtons;
 use craft\fields\Tags;
-use storychief\storychiefv3\storychief\FieldTypes\AssetsStoryChiefFieldType;
-use storychief\storychiefv3\storychief\FieldTypes\CategoriesStoryChiefFieldType;
-use storychief\storychiefv3\storychief\FieldTypes\CheckboxesStoryChiefFieldType;
-use storychief\storychiefv3\storychief\FieldTypes\DropdownStoryChiefFieldType;
-use storychief\storychiefv3\storychief\FieldTypes\EntriesStoryChiefFieldType;
-use storychief\storychiefv3\storychief\FieldTypes\LightswitchStoryChiefFieldType;
-use storychief\storychiefv3\storychief\FieldTypes\MultiSelectStoryChiefFieldType;
-use storychief\storychiefv3\storychief\FieldTypes\PlainTextStoryChiefFieldType;
-use storychief\storychiefv3\storychief\FieldTypes\RadioButtonsStoryChiefFieldType;
-use storychief\storychiefv3\storychief\FieldTypes\RichTextStoryChiefFieldType;
-use storychief\storychiefv3\storychief\FieldTypes\TagsStoryChiefFieldType;
+use storychief\storychief\storychief\FieldTypes\AssetsStoryChiefFieldType;
+use storychief\storychief\storychief\FieldTypes\CategoriesStoryChiefFieldType;
+use storychief\storychief\storychief\FieldTypes\CheckboxesStoryChiefFieldType;
+use storychief\storychief\storychief\FieldTypes\DropdownStoryChiefFieldType;
+use storychief\storychief\storychief\FieldTypes\EntriesStoryChiefFieldType;
+use storychief\storychief\storychief\FieldTypes\LightswitchStoryChiefFieldType;
+use storychief\storychief\storychief\FieldTypes\MultiSelectStoryChiefFieldType;
+use storychief\storychief\storychief\FieldTypes\PlainTextStoryChiefFieldType;
+use storychief\storychief\storychief\FieldTypes\RadioButtonsStoryChiefFieldType;
+use storychief\storychief\storychief\FieldTypes\RichTextStoryChiefFieldType;
+use storychief\storychief\storychief\FieldTypes\TagsStoryChiefFieldType;
 
 class StoryChiefHelper
 {
@@ -69,7 +71,7 @@ class StoryChiefHelper
         }
 
         switch (get_class($field)) {
-            // Default available fields
+                // Default available fields
             case Assets::class:
                 return AssetsStoryChiefFieldType::class;
             case Categories::class:
@@ -91,7 +93,7 @@ class StoryChiefHelper
             case PlainText::class:
                 return PlainTextStoryChiefFieldType::class;
 
-            // Plugin installed fields
+                // Plugin installed fields
             case 'craft\redactor\Field':
                 return RichTextStoryChiefFieldType::class;
             default:

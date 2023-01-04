@@ -4,7 +4,7 @@
  * Date: 16.07.19
  */
 
-namespace storychief\storychiefv3\events;
+namespace storychief\storychief\events;
 
 use yii\base\Event;
 

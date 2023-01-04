@@ -1,13 +1,10 @@
-
-# StoryChief v3 plugin for Craft CMS 3.x
+# StoryChief plugin for Craft CMS 3.x
 
 Craft CMS plugin to use with [StoryChief](https://storychief.io).
 
-
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0 or later. (If you are using Craft CMS 2.x, you can find the [right plugin here](https://github.com/Story-Chief/craft-cms-module-storychief).)
-
+This plugin requires Craft CMS 3.0.0 or later.
 
 ## Installation
 
@@ -26,17 +23,17 @@ Open your terminal and run the following commands:
 cd /path/to/my-project.test
 
 # tell Composer to load the plugin
-composer require storychief/craft-cms-v3-storychief
+composer require storychief/craft-cms-storychief
 
 # tell Craft to install the plugin
-./craft install/plugin storychief-v3
+./craft install/plugin storychief
 ```
 
-
 ## Activate
+
 To activate the plugin you first need to set up a new Craft CMS channel on your StoryChief admin panel. As soon as you create one, it will give you an **encryption key** .
 
-In your CRAFT CMS, go to your Settings/Plugins and activate your StoryChief plugin. Go to its Settings and fill the encryption key and website URL. 
+In your CRAFT CMS, go to your Settings/Plugins and activate your StoryChief plugin. Go to its Settings and fill the encryption key and website URL.
 
 Save it.
 
@@ -50,26 +47,26 @@ Note: this is mostly for developers that know basic PHP and Composer Packages.
 
 ### `beforeEntryPublish` and `beforeEntryUpdate` event
 
-This allows developers to execute custom functionality before saving a new or updating an entry, to modify data of a 
+This allows developers to execute custom functionality before saving a new or updating an entry, to modify data of a
 new entry.
 
-```php 
+```php
 
-use storychief\storychiefv3\events\EntryPublishEvent;
+use storychief\storychief\events\EntryPublishEvent;
 
 $this->on('beforeEntryPublish', function (EntryPublishEvent $event) {
     $payload = $event->payload;
     $settings = $event->settings;
     $entry = $event->entry;
-    
+
     // Example 1:
     $entry->sectionId = 2; // BLog
     $entry->typeId = 2;
-    
+
     // Example 2:
     if ($payload['data']['custom_fields']) {
         foreach ($payload['data']['custom_fields'] as $customField) {
-            if ($customField['key'] === 'custom_field_name') {                
+            if ($customField['key'] === 'custom_field_name') {
                 $entry->sectionId = $customField['value'];
                 $entry->typeId = 2;
             }
@@ -77,7 +74,7 @@ $this->on('beforeEntryPublish', function (EntryPublishEvent $event) {
     }
 });
 
-use storychief\storychiefv3\events\EntryUpdateEvent;
+use storychief\storychief\events\EntryUpdateEvent;
 
 $this->on('beforeEntryUpdate', function (EntryUpdateEvent $event) {
     // ...
@@ -97,4 +94,3 @@ Both events send out a `EntrySaveEvent` with the saved `Entry` object as its pro
 ---
 
 Brought to you by [StoryChief](https://github.com/Story-Chief/)
-

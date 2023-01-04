@@ -1,4 +1,6 @@
-<?php namespace storychief\storychiefv3\storychief\FieldTypes;
+<?php
+
+namespace storychief\storychief\storychief\FieldTypes;
 
 use Craft;
 use craft\helpers\Db;
@@ -21,10 +23,10 @@ class CategoriesStoryChiefFieldType implements StoryChiefFieldTypeInterface
         $preppedData = [];
         $categoryGroupUID = str_replace('group:', '', $field->source);
         $categoryGroup =  (new \craft\db\Query())
-        ->select(['id'])
-        ->from('{{%categorygroups}}')
-        ->where(['uid' => $categoryGroupUID])
-        ->one();
+            ->select(['id'])
+            ->from('{{%categorygroups}}')
+            ->where(['uid' => $categoryGroupUID])
+            ->one();
 
         $categoryGroupID = $categoryGroup['id'];
 

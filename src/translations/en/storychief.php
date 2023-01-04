@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Storychief v3 plugin for Craft CMS 3.x
+ * Storychief plugin for Craft CMS 3.x
  *
  * Craft CMS plugin to use with Storychief
  *
@@ -10,9 +11,9 @@
 
 /**
  * @author    Storychief
- * @package   StorychiefV3
+ * @package   storychief
  * @since     1.0.0
  */
 return [
-    'Storychief v3 plugin loaded' => 'Storychief v3 plugin loaded',
+    'Storychief plugin loaded' => 'Storychief plugin loaded',
 ];

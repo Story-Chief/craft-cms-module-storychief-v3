@@ -1,4 +1,6 @@
-<?php namespace storychief\storychiefv3\storychief\FieldTypes;
+<?php
+
+namespace storychief\storychief\storychief\FieldTypes;
 
 use Craft;
 use  craft\base\Field;
@@ -28,7 +30,7 @@ class AssetsStoryChiefFieldType implements StoryChiefFieldTypeInterface
         $volumeID = Craft::$app->getVolumes()->getVolumeByUid($volumeUID)->id;
         $folderID = Craft::$app->assets->getRootFolderByVolumeId($volumeID)->id;
 
-        $preppedData = [];        
+        $preppedData = [];
 
         // get remote image and store in temp path
         $imageInfo = pathinfo($fieldData);
@@ -38,13 +40,13 @@ class AssetsStoryChiefFieldType implements StoryChiefFieldTypeInterface
         // Look if the filename already exists and so the existing asset
         $asset = Asset::find()->where(
             [
-                'assets.volumeID' => $volumeID, 
-                'assets.folderId' => $folderID, 
+                'assets.volumeID' => $volumeID,
+                'assets.folderId' => $folderID,
                 'assets.filename' => $filename
             ]
         )->one();
 
-        if (!$asset) {            
+        if (!$asset) {
             file_put_contents($tempPath, fopen($fieldData, 'r'));
 
             $asset = new Asset();

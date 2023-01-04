@@ -1,1 +1,24 @@
-{"pluginName":"Storychief v3","pluginDescription":"Craft CMS plugin to use with Storychief","pluginVersion":"1.0.12","pluginAuthorName":"Storychief","pluginVendorName":"storychief","pluginAuthorUrl":"https://github.com/Story-Chief/","pluginAuthorGithub":"","codeComments":"","pluginComponents":"","consolecommandName":"","controllerName":"","cpsectionName":"","elementName":"","fieldName":"","modelName":"","purchasableName":"","recordName":"","serviceName":"","taskName":"","utilityName":"","widgetName":"","apiVersion":"api_version_3_0"}
+{
+  "pluginName": "Storychief",
+  "pluginDescription": "Craft CMS plugin to use with Storychief",
+  "pluginVersion": "1.0.12",
+  "pluginAuthorName": "Storychief",
+  "pluginVendorName": "storychief",
+  "pluginAuthorUrl": "https://github.com/Story-Chief/",
+  "pluginAuthorGithub": "",
+  "codeComments": "",
+  "pluginComponents": "",
+  "consolecommandName": "",
+  "controllerName": "",
+  "cpsectionName": "",
+  "elementName": "",
+  "fieldName": "",
+  "modelName": "",
+  "purchasableName": "",
+  "recordName": "",
+  "serviceName": "",
+  "taskName": "",
+  "utilityName": "",
+  "widgetName": "",
+  "apiVersion": "api_version_3_0"
+}

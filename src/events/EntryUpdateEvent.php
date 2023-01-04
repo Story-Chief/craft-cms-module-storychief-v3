@@ -1,9 +1,9 @@
 <?php
 
-namespace storychief\storychiefv3\events;
+namespace storychief\storychief\events;
 
 use craft\elements\Entry;
-use storychief\storychiefv3\models\Settings;
+use storychief\storychief\models\Settings;
 use yii\base\Event;
 
 class EntryUpdateEvent extends Event

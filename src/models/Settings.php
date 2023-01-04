@@ -1,6 +1,6 @@
 <?php
 
-namespace storychief\storychiefv3\models;
+namespace storychief\storychief\models;
 
 use craft\base\Model;
 
@@ -15,8 +15,8 @@ class Settings extends Model
     public function rules()
     {
         return [
-          [['key', 'section', 'entry_type'], 'string'],
-          [['key', 'section', 'entry_type'], 'required'],
-    ];
+            [['key', 'section', 'entry_type'], 'string'],
+            [['key', 'section', 'entry_type'], 'required'],
+        ];
     }
 }

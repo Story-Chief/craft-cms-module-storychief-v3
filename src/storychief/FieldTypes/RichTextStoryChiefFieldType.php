@@ -1,4 +1,6 @@
-<?php namespace storychief\storychiefv3\storychief\FieldTypes;
+<?php
+
+namespace storychief\storychief\storychief\FieldTypes;
 
 use  craft\base\Field;
 

@@ -1,16 +1,16 @@
 <?php
 
-namespace storychief\storychiefv3\controllers;
+namespace storychief\storychief\controllers;
 
 use craft;
 use yii\web\Controller;
 use craft\elements\Entry;
 use craft\elements\User;
-use storychief\storychiefv3\storychief\FieldTypes\StoryChiefFieldTypeInterface;
-use storychief\storychiefv3\events\EntryPublishEvent;
-use storychief\storychiefv3\events\EntryUpdateEvent;
-use storychief\storychiefv3\events\EntrySaveEvent;
-use storychief\storychiefv3\storychief\Helpers\StoryChiefHelper;
+use storychief\storychief\storychief\FieldTypes\StoryChiefFieldTypeInterface;
+use storychief\storychief\events\EntryPublishEvent;
+use storychief\storychief\events\EntryUpdateEvent;
+use storychief\storychief\events\EntrySaveEvent;
+use storychief\storychief\storychief\Helpers\StoryChiefHelper;
 
 class WebhookController extends Controller
 {
@@ -25,7 +25,7 @@ class WebhookController extends Controller
     public function __construct($id, $module = null)
     {
         parent::__construct($id, $module);
-        $this->settings = Craft::$app->plugins->getPlugin('storychief-v3')->getSettings();
+        $this->settings = Craft::$app->plugins->getPlugin('storychief')->getSettings();
         $entry = new Entry();
         $entry->sectionId = $this->settings['section'];
         $entry->typeId = $this->settings['entry_type'];
@@ -226,7 +226,7 @@ class WebhookController extends Controller
 
     protected function handleTestEventType()
     {
-        $storyChiefPlugin = Craft::$app->plugins->getPlugin('storychief-v3');
+        $storyChiefPlugin = Craft::$app->plugins->getPlugin('storychief');
         if (isset($this->payload['data']['custom_fields']['data'])) {
             Craft::$app->plugins->savePluginSettings($storyChiefPlugin, [
                 'custom_field_definitions' => $this->payload['data']['custom_fields']['data'],
@@ -368,8 +368,7 @@ class WebhookController extends Controller
 
     private function _isLanguageSetInPayload()
     {
-        return (
-            isset($this->payload['data']['language'])
+        return (isset($this->payload['data']['language'])
             && $this->payload['data']['language']
         );
     }
@@ -381,7 +380,8 @@ class WebhookController extends Controller
             ->from('{{%sites}}')
             ->where([
                 'language' => $language ?: $this->payload['data']['language'],
-                'groupId' => $this->group->id])
+                'groupId' => $this->group->id
+            ])
             ->one();
     }
 }

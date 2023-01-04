@@ -1,4 +1,6 @@
-<?php namespace storychief\storychiefv3\storychief\FieldTypes;
+<?php
+
+namespace storychief\storychief\storychief\FieldTypes;
 
 use Craft;
 use craft\base\Field;
@@ -31,10 +33,10 @@ class TagsStoryChiefFieldType implements StoryChiefFieldTypeInterface
         list($type, $groupUid) = explode(':', $source);
 
         $tagGroup =  (new \craft\db\Query())
-        ->select(['id'])
-        ->from('{{%taggroups}}')
-        ->where(['uid' => $groupUid])
-        ->one();
+            ->select(['id'])
+            ->from('{{%taggroups}}')
+            ->where(['uid' => $groupUid])
+            ->one();
 
         $groupId = $tagGroup['id'];
 

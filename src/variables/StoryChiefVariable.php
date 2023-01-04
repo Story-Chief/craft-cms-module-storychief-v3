@@ -1,8 +1,9 @@
 <?php
-namespace storychief\storychiefv3\variables;
 
-use storychief\storychiefv3\storychief\FieldTypes\StoryChiefFieldTypeInterface;
-use storychief\storychiefv3\storychief\Helpers\StoryChiefHelper;
+namespace storychief\storychief\variables;
+
+use storychief\storychief\storychief\FieldTypes\StoryChiefFieldTypeInterface;
+use storychief\storychief\storychief\Helpers\StoryChiefHelper;
 use craft;
 
 class StoryChiefVariable
@@ -62,7 +63,7 @@ class StoryChiefVariable
             ],
         ];
 
-        $settings = Craft::$app->plugins->getPlugin('storychief-v3')->getSettings();
+        $settings = Craft::$app->plugins->getPlugin('storychief')->getSettings();
         $custom_fields = $settings['custom_field_definitions'];
 
         return array_merge($default_fields, $custom_fields);
@@ -89,8 +90,8 @@ class StoryChiefVariable
         foreach ($allFields as $item) {
             if (in_array($item['type'], $supportedTypes, true)) {
                 $options[] = [
-                  'label' => $item['label'],
-                  'value' => $item['name'],
+                    'label' => $item['label'],
+                    'value' => $item['name'],
                 ];
             }
         }
