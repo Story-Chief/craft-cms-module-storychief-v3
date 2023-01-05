@@ -2,7 +2,7 @@
   "name": "storychief/craft-cms-v3-storychief",
   "description": "Craft CMS plugin to use with Storychief",
   "type": "craft-plugin",
-  "version": "4.0.0",
+  "version": "2.0.0",
   "keywords": [
     "craft cms 4",
     "cms",
