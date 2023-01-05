@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Storychief v3 plugin for Craft CMS 3.x
  *
@@ -38,16 +39,16 @@ class StorychiefV3 extends Plugin
      * @var StorychiefV3
      */
     public static $plugin;
-    
-    
+
+
     // Public Properties
     // =========================================================================
-    
+
     /**
      * @var string
      */
-    public $schemaVersion = '1.0.0';
-    public $hasCpSettings = true;
+    public string $schemaVersion = '1.0.0';
+    public bool $hasCpSettings = true;
 
     // Public Methods
     // =========================================================================
@@ -93,11 +94,11 @@ class StorychiefV3 extends Plugin
 
     // Protected Methods
     // =========================================================================
-    protected function createSettingsModel()
+    protected function createSettingsModel(): ?\craft\base\Model
     {
         return new Settings();
     }
-    protected function settingsHtml()
+    protected function settingsHtml(): ?string
     {
         $settings = $this->getSettings();
         $settings->validate();

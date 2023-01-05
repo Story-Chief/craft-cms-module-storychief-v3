@@ -12,7 +12,7 @@ class Settings extends Model
     public $mapping = null;
     public $custom_field_definitions = [];
 
-    public function rules()
+    public function rules(): array
     {
         return [
           [['key', 'section', 'entry_type'], 'string'],

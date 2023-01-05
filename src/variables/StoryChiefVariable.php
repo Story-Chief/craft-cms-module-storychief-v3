@@ -1,4 +1,5 @@
 <?php
+
 namespace storychief\storychiefv3\variables;
 
 use storychief\storychiefv3\storychief\FieldTypes\StoryChiefFieldTypeInterface;
@@ -89,8 +90,8 @@ class StoryChiefVariable
         foreach ($allFields as $item) {
             if (in_array($item['type'], $supportedTypes, true)) {
                 $options[] = [
-                  'label' => $item['label'],
-                  'value' => $item['name'],
+                    'label' => $item['label'],
+                    'value' => $item['name'],
                 ];
             }
         }
@@ -136,7 +137,7 @@ class StoryChiefVariable
         $entryType = \Craft::$app->sections->getEntryTypeById($entryTypeID);
 
 
-        $fields = $entryType->getFieldLayout()->getFields();
+        $fields = $entryType->getFieldLayout()->getCustomFields();
 
         foreach ($fields as $field) {
             $fieldDefinition = $field->getAttributes(['id', 'name', 'handle']);
