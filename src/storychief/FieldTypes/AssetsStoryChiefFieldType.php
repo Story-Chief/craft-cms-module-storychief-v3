@@ -17,9 +17,9 @@ class AssetsStoryChiefFieldType implements StoryChiefFieldTypeInterface
 
     public function prepFieldData(Field $field, $fieldData)
     {
-        if ($field->useSingleFolder) {
-            $volumeUID = explode(':', $field->singleUploadLocationSource)[1];
-            $subPath = $field['singleUploadLocationSubpath'];
+        if ($field->restrictLocation) {
+            $volumeUID = explode(':', $field->restrictedLocationSource)[1];
+            $subPath = $field['restrictedLocationSubpath'];
         } else {
             $volumeUID = explode(':', $field->defaultUploadLocationSource)[1];
             $subPath = $field['defaultUploadLocationSubpath'];
